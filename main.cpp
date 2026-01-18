@@ -16,5 +16,7 @@ int main(int argc, char* argv[], char* envp[])
 	for (char** env = envp; *env != nullptr; ++env) {
 		cout << "  " << *env << endl;
 	}
+
+	cout << "OpenGL Version: " << GLVersion.major << "." << GLVersion.minor << endl;
 	return 0;
 }
