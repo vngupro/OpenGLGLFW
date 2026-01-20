@@ -63,6 +63,12 @@ int main(int argc, char* argv[], char* envp[])
         glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        float vertices[] = {
+            -0.5f, -0.5f, 0.0f,
+             0.5f, -0.5f, 0.0f,
+             0.0f,  0.5f, 0.0f
+        };
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
