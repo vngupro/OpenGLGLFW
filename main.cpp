@@ -134,8 +134,8 @@ int main()
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
     // Shaders
-    std::string vertexCode = loadShaderSource("vertex.glsl");
-    std::string fragmentCode = loadShaderSource("fragment.glsl");
+    std::string vertexCode = loadShaderSource("shaders/vertex.glsl");
+    std::string fragmentCode = loadShaderSource("shaders/fragment.glsl");
 
     const char* vertexShaderSrc = vertexCode.c_str();
     const char* fragmentShaderSrc = fragmentCode.c_str();
@@ -180,7 +180,12 @@ int main()
         glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        GLfloat timeValue = (GLfloat)glfwGetTime();
+        GLfloat greenValue = sinf(timeValue) * 0.5f + 0.5f;
+        GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUseProgram(shaderProgram);
+        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
