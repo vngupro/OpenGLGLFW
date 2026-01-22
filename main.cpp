@@ -5,6 +5,10 @@
 #include <sstream>
 #include <string>
 
+static bool fill = true;
+static bool wireframe = false;
+static bool point = false;
+
 // Shader loading utility
 std::string loadShaderSource(const char* path)
 {
@@ -31,6 +35,39 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+
+    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        fill = true;
+        wireframe = false;
+        point = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+        glLineWidth(2.0f);
+        fill = false;
+		wireframe = true;
+        point = false;
+    }
+
+    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+    {
+        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+        glPointSize(5.0f);
+        fill = false;
+        wireframe = false;
+		point = true;
+    }
+
+    // Face culling controls
+    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+        glEnable(GL_CULL_FACE);
+
+    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+        glDisable(GL_CULL_FACE);
 }
 
 // Shader helpers
@@ -92,6 +129,7 @@ int main()
         std::cerr << "Failed to initialize GLAD\n";
         return -1;
     }
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
@@ -105,19 +143,31 @@ int main()
     unsigned int shaderProgram = createShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
     // Triangle data
+
     float vertices[] = {
-        -0.5f, -0.5f, 0.0f,
-         0.5f, -0.5f, 0.0f,
-         0.0f,  0.5f, 0.0f
+         0.5f,  0.5f, 0.0f,  // 0 top right
+         0.5f, -0.5f, 0.0f,  // 1 bottom right
+        -0.5f, -0.5f, 0.0f,  // 2 bottom left
+        -0.5f,  0.5f, 0.0f   // 3 top left
     };
 
-    unsigned int VAO, VBO;
+    // CCW triangles
+    unsigned int indices[] = {
+        0, 3, 1,   // first triangle
+        1, 3, 2    // second triangle
+    };
+
+    unsigned int VAO, VBO, EBO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
@@ -132,7 +182,7 @@ int main()
 
         glUseProgram(shaderProgram);
         glBindVertexArray(VAO);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
