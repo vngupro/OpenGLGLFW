@@ -133,11 +133,23 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="3rdParty\glad\src\glad.c" />
+    <ClCompile Include="Circle.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="ScreenQuad.cpp" />
+    <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragment.glsl" />
     <None Include="shaders\vertex.glsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Circle.h" />
+    <ClInclude Include="Mesh.h" />
+    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="ScreenQuad.h" />
+    <ClInclude Include="Triangle.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

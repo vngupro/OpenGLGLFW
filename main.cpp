@@ -142,19 +142,30 @@ int main()
 
     unsigned int shaderProgram = createShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
-    // Triangle data
+    //// Triangle data
+    //float vertices[] = {
+    //     0.5f,  0.5f, 0.0f,  // 0 top right
+    //     0.5f, -0.5f, 0.0f,  // 1 bottom right
+    //    -0.5f, -0.5f, 0.0f,  // 2 bottom left
+    //    -0.5f,  0.5f, 0.0f   // 3 top left
+    //};
 
+    //// CCW triangles
+    //unsigned int indices[] = {
+    //    0, 3, 1,   // first triangle
+    //    1, 3, 2    // second triangle
+    //};
+
+    // Color change triangle
     float vertices[] = {
-         0.5f,  0.5f, 0.0f,  // 0 top right
-         0.5f, -0.5f, 0.0f,  // 1 bottom right
-        -0.5f, -0.5f, 0.0f,  // 2 bottom left
-        -0.5f,  0.5f, 0.0f   // 3 top left
+        // positions         // colors
+         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
+        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
+         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
     };
 
-    // CCW triangles
     unsigned int indices[] = {
-        0, 3, 1,   // first triangle
-        1, 3, 2    // second triangle
+        0, 2, 1   // first triangle
     };
 
     unsigned int VAO, VBO, EBO;
@@ -169,8 +180,15 @@ int main()
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    //glEnableVertexAttribArray(0);
+
+    // position attribute
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
+    // color attribute
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     // Render loop
     while (!glfwWindowShouldClose(window))
