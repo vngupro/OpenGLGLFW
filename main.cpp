@@ -198,6 +198,7 @@ int main()
         glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+		//To Do add multiple meshes 
         GLfloat timeValue = (GLfloat)glfwGetTime();
         GLfloat greenValue = sinf(timeValue) * 0.5f + 0.5f;
         GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
