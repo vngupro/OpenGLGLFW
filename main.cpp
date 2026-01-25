@@ -5,9 +5,25 @@
 #include <sstream>
 #include <string>
 
+#include "Mesh.h"
+#include "Rectangle.h"
+#include "Circle.h"
+#include "Triangle.h"
+#include "ScreenQuad.h"
+
 static bool fill = true;
 static bool wireframe = false;
 static bool point = false;
+
+enum class RenderMesh
+{
+    Triangle,
+    Rectangle,
+    Circle,
+    ScreenQuad
+};
+
+static RenderMesh currentMesh = RenderMesh::Triangle;
 
 // Shader loading utility
 std::string loadShaderSource(const char* path)
@@ -68,6 +84,19 @@ void processInput(GLFWwindow* window)
 
     if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
         glDisable(GL_CULL_FACE);
+
+    // Mesh switching
+    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+        currentMesh = RenderMesh::Triangle;
+
+    if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+        currentMesh = RenderMesh::Rectangle;
+
+    if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+        currentMesh = RenderMesh::Circle;
+
+    if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
+        currentMesh = RenderMesh::ScreenQuad;
 }
 
 // Shader helpers
@@ -142,53 +171,10 @@ int main()
 
     unsigned int shaderProgram = createShaderProgram(vertexShaderSrc, fragmentShaderSrc);
 
-    //// Triangle data
-    //float vertices[] = {
-    //     0.5f,  0.5f, 0.0f,  // 0 top right
-    //     0.5f, -0.5f, 0.0f,  // 1 bottom right
-    //    -0.5f, -0.5f, 0.0f,  // 2 bottom left
-    //    -0.5f,  0.5f, 0.0f   // 3 top left
-    //};
-
-    //// CCW triangles
-    //unsigned int indices[] = {
-    //    0, 3, 1,   // first triangle
-    //    1, 3, 2    // second triangle
-    //};
-
-    // Color change triangle
-    float vertices[] = {
-        // positions         // colors
-         0.5f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,   // bottom right
-        -0.5f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,   // bottom left
-         0.0f,  0.5f, 0.0f,  0.0f, 0.0f, 1.0f    // top
-    };
-
-    unsigned int indices[] = {
-        0, 2, 1   // first triangle
-    };
-
-    unsigned int VAO, VBO, EBO;
-    glGenVertexArrays(1, &VAO);
-    glGenBuffers(1, &VBO);
-    glGenBuffers(1, &EBO);
-
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-    //glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-    //glEnableVertexAttribArray(0);
-
-    // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
+	Triangle triangle;
+	Rectangle rectangle(0.8f, 0.6f);
+	Circle circle(0.5f, 64);
+	ScreenQuad screenQuad;
 
     // Render loop
     while (!glfwWindowShouldClose(window))
@@ -198,21 +184,35 @@ int main()
         glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+        switch (currentMesh)
+        {
+        case RenderMesh::Triangle:
+            triangle.Draw();
+            break;
+
+        case RenderMesh::Rectangle:
+            rectangle.Draw();
+            break;
+
+        case RenderMesh::Circle:
+            circle.Draw();
+            break;
+
+        case RenderMesh::ScreenQuad:
+            screenQuad.Draw();
+            break;
+        }
+
         GLfloat timeValue = (GLfloat)glfwGetTime();
         GLfloat greenValue = sinf(timeValue) * 0.5f + 0.5f;
         GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
         glUseProgram(shaderProgram);
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
-        glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
-    glDeleteVertexArrays(1, &VAO);
-    glDeleteBuffers(1, &VBO);
     glDeleteProgram(shaderProgram);
 
     glfwDestroyWindow(window);
