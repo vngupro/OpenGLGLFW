@@ -10,6 +10,7 @@
 #include "Circle.h"
 #include "Triangle.h"
 #include "ScreenQuad.h"
+#include "Shader.h"
 
 static bool fill = true;
 static bool wireframe = false;
@@ -24,21 +25,6 @@ enum class RenderMesh
 };
 
 static RenderMesh currentMesh = RenderMesh::Triangle;
-
-// Shader loading utility
-std::string loadShaderSource(const char* path)
-{
-    std::ifstream file(path);
-    if (!file)
-    {
-        std::cerr << "Failed to open shader file: " << path << std::endl;
-        return "";
-    }
-
-    std::stringstream buffer;
-    buffer << file.rdbuf();
-    return buffer.str();
-}
 
 // Resize callback
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
@@ -99,40 +85,6 @@ void processInput(GLFWwindow* window)
         currentMesh = RenderMesh::ScreenQuad;
 }
 
-// Shader helpers
-unsigned int compileShader(unsigned int type, const char* source)
-{
-    unsigned int shader = glCreateShader(type);
-    glShaderSource(shader, 1, &source, nullptr);
-    glCompileShader(shader);
-
-    int success;
-    glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        char infoLog[512];
-        glGetShaderInfoLog(shader, 512, nullptr, infoLog);
-        std::cerr << "Shader compilation error:\n" << infoLog << std::endl;
-    }
-    return shader;
-}
-
-unsigned int createShaderProgram(const char* vs, const char* fs)
-{
-    unsigned int vertex = compileShader(GL_VERTEX_SHADER, vs);
-    unsigned int fragment = compileShader(GL_FRAGMENT_SHADER, fs);
-
-    unsigned int program = glCreateProgram();
-    glAttachShader(program, vertex);
-    glAttachShader(program, fragment);
-    glLinkProgram(program);
-
-    glDeleteShader(vertex);
-    glDeleteShader(fragment);
-
-    return program;
-}
-
 int main()
 {
     // GLFW init
@@ -163,13 +115,7 @@ int main()
     std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
 
     // Shaders
-    std::string vertexCode = loadShaderSource("shaders/vertex.glsl");
-    std::string fragmentCode = loadShaderSource("shaders/fragment.glsl");
-
-    const char* vertexShaderSrc = vertexCode.c_str();
-    const char* fragmentShaderSrc = fragmentCode.c_str();
-
-    unsigned int shaderProgram = createShaderProgram(vertexShaderSrc, fragmentShaderSrc);
+    Shader shader("shaders/vertex.glsl", "shaders/fragment.glsl");
 
 	Triangle triangle;
 	Rectangle rectangle(0.8f, 0.6f);
@@ -183,6 +129,8 @@ int main()
 
         glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        shader.use();
 
         switch (currentMesh)
         {
@@ -205,15 +153,11 @@ int main()
 
         GLfloat timeValue = (GLfloat)glfwGetTime();
         GLfloat greenValue = sinf(timeValue) * 0.5f + 0.5f;
-        GLint vertexColorLocation = glGetUniformLocation(shaderProgram, "ourColor");
-        glUseProgram(shaderProgram);
-        glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
+		shader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
-    glDeleteProgram(shaderProgram);
 
     glfwDestroyWindow(window);
     glfwTerminate();

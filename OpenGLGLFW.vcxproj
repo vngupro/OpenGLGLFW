@@ -138,6 +138,7 @@
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="ScreenQuad.cpp" />
+    <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Triangle.cpp" />
   </ItemGroup>
   <ItemGroup>

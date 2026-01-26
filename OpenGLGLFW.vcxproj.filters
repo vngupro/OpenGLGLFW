@@ -45,6 +45,9 @@
     <ClCompile Include="Triangle.cpp">
       <Filter>Source Files\Meshes</Filter>
     </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragment.glsl">
