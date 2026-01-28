@@ -15,6 +15,9 @@
 static bool fill = true;
 static bool wireframe = false;
 static bool point = false;
+static int currentAnimType = 1; // start with 1 = sine
+static const int maxAnimType = 9; // total number of animations we defined in shader
+
 
 enum class RenderMesh
 {
@@ -35,6 +38,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // Input
 void processInput(GLFWwindow* window)
 {
+    static bool aPressedLastFrame = false;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 
@@ -83,6 +88,17 @@ void processInput(GLFWwindow* window)
 
     if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
         currentMesh = RenderMesh::ScreenQuad;
+
+    // Cycle animation type with A key
+    bool aPressed = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+    if (aPressed && !aPressedLastFrame) // only trigger once per press
+    {
+        currentAnimType++;
+        if (currentAnimType > maxAnimType)
+            currentAnimType = 1; // wrap around
+        std::cout << "Animation type: " << currentAnimType << std::endl;
+    }
+    aPressedLastFrame = aPressed;
 }
 
 int main()
@@ -131,6 +147,17 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.use();
+        shader.setBool("uAnimate", true);
+        shader.setFloat("uTime", static_cast<float>(glfwGetTime()));
+        shader.setVec3("uOffset", 0.0f, 0.0f, 0.0f);
+        shader.setFloat("uSpeed", 1.0f);
+
+        // axis for axis-based animations
+        shader.setVec3("uAxis", 0.0f, 1.0f, 0.0f);
+        shader.setFloat("uAmp", 0.3f);
+
+        // set the current animation type from the cycling key
+        shader.setInt("uAnimType", currentAnimType);
 
         switch (currentMesh)
         {
