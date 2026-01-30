@@ -43,21 +43,21 @@ void Mesh::SetupMesh(const std::vector<float>& vertices, const std::vector<unsig
         indices.data(),
         GL_STATIC_DRAW);
 
-    // position attribute
-    glVertexAttribPointer(
-        0, 3, GL_FLOAT, GL_FALSE,
-        6 * sizeof(float),
-        (void*)0
-    );
+    GLsizei stride = 8 * sizeof(float);
+
+    // position
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, stride, (void*)0);
     glEnableVertexAttribArray(0);
 
-    // color attribute
-    glVertexAttribPointer(
-        1, 3, GL_FLOAT, GL_FALSE,
-        6 * sizeof(float),
-        (void*)(3 * sizeof(float))
-    );
+    // color
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, stride,
+        (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // tex coords
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, stride,
+        (void*)(6 * sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     glBindVertexArray(0);
 }

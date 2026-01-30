@@ -9,8 +9,9 @@ Circle::Circle(float radius, int segments)
 
     // center vertex
     vertices.insert(vertices.end(), {
-        0.0f, 0.0f, 0.0f,  // position
-        1.0f, 1.0f, 1.0f   // color (white)
+        0.0f, 0.0f, 0.0f,   // position
+        1.0f, 1.0f, 1.0f,   // color
+        0.5f, 0.5f          // tex coord (center)
         });
 
     // circle perimeter
@@ -20,13 +21,18 @@ Circle::Circle(float radius, int segments)
         float x = cosf(angle) * radius;
         float y = sinf(angle) * radius;
 
+        // map from [-radius, radius] → [0, 1]
+        float u = (x / radius + 1.0f) * 0.5f;
+        float v = (y / radius + 1.0f) * 0.5f;
+
         vertices.insert(vertices.end(), {
             x, y, 0.0f,      // position
-            0.2f, 0.7f, 1.0f // color
+            0.2f, 0.7f, 1.0f,// color
+            u, v             // tex coords
             });
     }
 
-    // triangle indices
+    // triangle fan indices
     for (int i = 1; i <= segments; ++i)
     {
         indices.push_back(0);

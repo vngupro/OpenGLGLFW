@@ -7,11 +7,11 @@ Rectangle::Rectangle(float width, float height)
     float hh = height / 2.0f;
 
     std::vector<float> vertices = {
-        // positions         // colors
-        -hw, -hh, 0.0f,      1.0f, 0.0f, 0.0f, // bottom-left, red
-         hw, -hh, 0.0f,      0.0f, 1.0f, 0.0f, // bottom-right, green
-         hw,  hh, 0.0f,      0.0f, 0.0f, 1.0f, // top-right, blue
-        -hw,  hh, 0.0f,      1.0f, 1.0f, 0.0f  // top-left, yellow
+        // positions         // colors           // tex coords
+        -hw, -hh, 0.0f,      1.0f, 0.0f, 0.0f,    0.0f, 0.0f, // bottom-left
+         hw, -hh, 0.0f,      0.0f, 1.0f, 0.0f,    1.0f, 0.0f, // bottom-right
+         hw,  hh, 0.0f,      0.0f, 0.0f, 1.0f,    1.0f, 1.0f, // top-right
+        -hw,  hh, 0.0f,      1.0f, 1.0f, 0.0f,    0.0f, 1.0f  // top-left
     };
 
     std::vector<unsigned int> indices = {

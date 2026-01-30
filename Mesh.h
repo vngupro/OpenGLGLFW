@@ -21,5 +21,5 @@ public:
     void Draw() const;
 
 protected:
-    void SetupMesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
+    virtual void SetupMesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
 };

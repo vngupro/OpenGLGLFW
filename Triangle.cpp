@@ -6,10 +6,10 @@ Triangle::Triangle(float size)
     float h = size * 0.866f; // height for equilateral triangle
 
     std::vector<float> vertices = {
-        // pos                          // colors
-         0.0f,         h / 2.0f, 0.0f,  1.0f, 0.0f, 0.0f, // top, red
-        -size / 2.0f, -h / 2.0f, 0.0f,  0.0f, 1.0f, 0.0f, // bottom-left, green
-         size / 2.0f, -h / 2.0f, 0.0f,  0.0f, 0.0f, 1.0f  // bottom-right, blue
+        // pos                         // color            // tex coords
+         0.0f,        h / 2.0f, 0.0f,   1.0f, 0.0f, 0.0f,   0.5f, 1.0f, // top
+        -size / 2.0f, -h / 2.0f, 0.0f,  0.0f, 1.0f, 0.0f,   0.0f, 0.0f, // bottom-left
+         size / 2.0f, -h / 2.0f, 0.0f,  0.0f, 0.0f, 1.0f,   1.0f, 0.0f  // bottom-right
     };
 
     std::vector<unsigned int> indices = {
