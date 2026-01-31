@@ -138,24 +138,30 @@ int main()
 	ScreenQuad screenQuad;
 
     unsigned int texture;
+    bool textureLoaded = false;
+
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
-    // set the texture wrapping/filtering options (on the currently bound texture object)
+
+    // texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    // load and generate the texture
+
+    // load the texture
     int width, height, nrChannels;
-    unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
+    unsigned char* data = stbi_load("wall.jpg", &width, &height, &nrChannels, 0);
+
     if (data)
     {
+        textureLoaded = true;
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
         glGenerateMipmap(GL_TEXTURE_2D);
     }
     else
     {
-        std::cout << "Failed to load texture" << std::endl;
+        std::cout << "Failed to load texture, using vertex colors" << std::endl;
     }
     stbi_image_free(data);
 
@@ -168,6 +174,17 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
 
         shader.use();
+
+		// texture uniform
+        shader.setBool("uUseTexture", textureLoaded);
+        if (textureLoaded)
+        {
+            glActiveTexture(GL_TEXTURE0);
+            glBindTexture(GL_TEXTURE_2D, texture);
+            shader.setInt("uTexture", 0);
+        }
+
+		// animation uniforms
         shader.setBool("uAnimate", true);
         shader.setFloat("uTime", static_cast<float>(glfwGetTime()));
         shader.setVec3("uOffset", 0.0f, 0.0f, 0.0f);
@@ -179,9 +196,6 @@ int main()
 
         // set the current animation type from the cycling key
         shader.setInt("uAnimType", currentAnimType);
-
-        int width, height, nrChannels;
-        unsigned char* data = stbi_load("container.jpg", &width, &height, &nrChannels, 0);
 
         switch (currentMesh)
         {

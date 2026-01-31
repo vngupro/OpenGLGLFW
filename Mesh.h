@@ -20,6 +20,8 @@ public:
 
     void Draw() const;
 
+    bool hasTexture = false;
+
 protected:
     virtual void SetupMesh(const std::vector<float>& vertices, const std::vector<unsigned int>& indices);
 };
