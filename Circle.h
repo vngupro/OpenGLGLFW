@@ -6,3 +6,5 @@ class Circle : public Mesh
 public:
     Circle(float radius = 0.5f, int segments = 32);
 };
+
+//To do add optimuze circle
