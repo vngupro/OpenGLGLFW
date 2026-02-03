@@ -6,6 +6,7 @@ in vec3 ourColor;
 in vec2 ourTex;
 
 uniform sampler2D uTexture;
+uniform sampler2D uTexture2;
 uniform bool uUseTexture;
 
 void main()
