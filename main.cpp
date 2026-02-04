@@ -138,10 +138,13 @@ int main()
 	ScreenQuad screenQuad;
 
     unsigned int texture;
+	unsigned int texture2;
     bool textureLoaded = false;
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
+    glGenTextures(1, &texture2);
+    glBindTexture(GL_TEXTURE_2D, texture2);
 
     // texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -181,6 +184,8 @@ int main()
         {
             glActiveTexture(GL_TEXTURE0);
             glBindTexture(GL_TEXTURE_2D, texture);
+            glActiveTexture(GL_TEXTURE1);
+            glBindTexture(GL_TEXTURE_2D, texture2);
             shader.setInt("uTexture", 0);
         }
 
