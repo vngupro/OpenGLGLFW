@@ -137,6 +137,7 @@ int main()
 	Circle circle(0.5f, 64);
 	ScreenQuad screenQuad;
 
+    //Fix texture 2
     unsigned int texture;
 	unsigned int texture2;
     bool textureLoaded = false;
