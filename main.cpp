@@ -142,6 +142,7 @@ int main()
 	unsigned int texture2;
     bool textureLoaded = false;
 
+	// to do add physics-based animation uniforms here (e.g. gravity, mass, etc.) and pass them to shader
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
     glGenTextures(1, &texture2);
