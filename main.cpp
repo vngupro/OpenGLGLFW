@@ -35,6 +35,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 }
 
 // Input
+// TO DO: add control scheme
 void processInput(GLFWwindow* window)
 {
     static bool aPressedLastFrame = false;
