@@ -158,6 +158,7 @@ int main()
     int width, height, nrChannels;
     unsigned char* data = stbi_load("wall.jpg", &width, &height, &nrChannels, 0);
 
+	// add multiple type of collision detection uniforms here (e.g. bounding box, circle collision, etc.) and pass them to shader for different collision-based animations
     if (data)
     {
         textureLoaded = true;
