@@ -133,6 +133,7 @@ int main()
     // Shaders
     Shader shader("shaders/vertex.glsl", "shaders/fragment.glsl");
 
+	// add ecs system here and create entities with different components (e.g. Transform, Renderable, Physics) to manage complex animations and interactions in a more organized way
 	Triangle triangle;
 	Rectangle rectangle(0.8f, 0.6f);
 	Circle circle(0.5f, 64);
