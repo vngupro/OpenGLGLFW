@@ -17,7 +17,12 @@ static bool point = false;
 static int currentAnimType = 1; // start with 1 = sine
 static const int maxAnimType = 9; // total number of animations we defined in shader
 
-
+// How to extend the mesh so it can render a .obj or .fbx file?
+// 1. Add a new class ObjMesh that inherits from Mesh.
+// 2. Implement a constructor that loads the .obj file and sets up the vertex data.
+// 3. Implement the Draw() method to render the loaded mesh.
+// 4. Add a new case in the RenderMesh enum and handle it in the main render loop.
+// 5. Add input handling to switch to the new mesh type.
 enum class RenderMesh
 {
     Triangle,
@@ -176,6 +181,7 @@ int main()
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
+		// delta time for animation timing
         processInput(window);
 
         glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
