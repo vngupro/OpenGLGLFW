@@ -121,7 +121,7 @@ int main()
         glfwTerminate();
         return -1;
     }
-
+	// to do: add lighting controls here (e.g. toggle directional/point lights, adjust light color/intensity, etc.) and pass them to shader for dynamic lighting effects
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
