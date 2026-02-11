@@ -178,6 +178,8 @@ int main()
     }
     stbi_image_free(data);
 
+	// add coordinate system controls here (e.g. toggle between world/local space, adjust axis orientation, etc.) and pass them to shader for more flexible animation effects
+
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
