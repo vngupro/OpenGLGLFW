@@ -106,6 +106,7 @@ void processInput(GLFWwindow* window)
     aPressedLastFrame = aPressed;
 }
 
+// to do level switch
 int main()
 {
     // GLFW init
