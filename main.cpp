@@ -107,6 +107,7 @@ void processInput(GLFWwindow* window)
 }
 
 // to do level switch
+// to do : add more complex animation types (e.g. physics-based, procedural, etc.) and implement them in the shader for more dynamic and varied animation effects
 int main()
 {
     // GLFW init
