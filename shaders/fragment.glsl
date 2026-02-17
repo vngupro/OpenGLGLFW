@@ -12,7 +12,12 @@ uniform bool uUseTexture;
 void main()
 {
     if (uUseTexture)
-        FragColor = texture(uTexture, ourTex) * vec4(ourColor, 1.0);
+    {
+        vec4 tex1 = texture(uTexture, ourTex);
+        vec4 tex2 = texture(uTexture2, ourTex);
+
+        FragColor = mix(tex1, tex2, 0.5) * vec4(ourColor, 1.0);
+    }
     else
         FragColor = vec4(ourColor, 1.0);
 }

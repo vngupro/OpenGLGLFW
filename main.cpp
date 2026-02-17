@@ -145,17 +145,18 @@ int main()
 	Rectangle rectangle(0.8f, 0.6f);
 	Circle circle(0.5f, 64);
 	ScreenQuad screenQuad;
-
-    //Fix texture 2
     unsigned int texture;
-	unsigned int texture2;
+    unsigned int texture2;
     bool textureLoaded = false;
 
-	// to do add physics-based animation uniforms here (e.g. gravity, mass, etc.) and pass them to shader
+    // Generate textures
     glGenTextures(1, &texture);
-    glBindTexture(GL_TEXTURE_2D, texture);
     glGenTextures(1, &texture2);
-    glBindTexture(GL_TEXTURE_2D, texture2);
+
+    // =====================
+    // TEXTURE 1 (wall.jpg)
+    // =====================
+    glBindTexture(GL_TEXTURE_2D, texture);
 
     // texture parameters
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
@@ -163,11 +164,9 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    // load the texture
     int width, height, nrChannels;
     unsigned char* data = stbi_load("wall.jpg", &width, &height, &nrChannels, 0);
 
-	// add multiple type of collision detection uniforms here (e.g. bounding box, circle collision, etc.) and pass them to shader for different collision-based animations
     if (data)
     {
         textureLoaded = true;
@@ -176,9 +175,35 @@ int main()
     }
     else
     {
-        std::cout << "Failed to load texture, using vertex colors" << std::endl;
+        std::cout << "Failed to load wall.jpg" << std::endl;
     }
     stbi_image_free(data);
+
+
+    // ==========================
+    // TEXTURE 2 (awesomeface.png)
+    // ==========================
+    glBindTexture(GL_TEXTURE_2D, texture2);
+
+    // Set parameters again (each texture needs its own parameters)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
+
+    if (data)
+    {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+    }
+    else
+    {
+        std::cout << "Failed to load awesomeface.png" << std::endl;
+    }
+    stbi_image_free(data);
+
 
 	// add coordinate system controls here (e.g. toggle between world/local space, adjust axis orientation, etc.) and pass them to shader for more flexible animation effects
 
@@ -202,6 +227,7 @@ int main()
             glActiveTexture(GL_TEXTURE1);
             glBindTexture(GL_TEXTURE_2D, texture2);
             shader.setInt("uTexture", 0);
+			shader.setInt("uTexture2", 1);
         }
 
 		// animation uniforms
