@@ -1,5 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
+#include <gtc/type_ptr.hpp>
 #include <iostream>
 
 #include "stb_image.h"
@@ -191,8 +194,9 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
+    stbi_set_flip_vertically_on_load(true);
     data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-
+    stbi_set_flip_vertically_on_load(false);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -203,7 +207,6 @@ int main()
         std::cout << "Failed to load awesomeface.png" << std::endl;
     }
     stbi_image_free(data);
-
 
 	// add coordinate system controls here (e.g. toggle between world/local space, adjust axis orientation, etc.) and pass them to shader for more flexible animation effects
 
@@ -272,5 +275,12 @@ int main()
 
     glfwDestroyWindow(window);
     glfwTerminate();
+
+    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    vec = trans * vec;
+    std::cout << vec.x << vec.y << vec.z << std::endl;
+
     return 0;
 }
