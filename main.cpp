@@ -209,6 +209,19 @@ int main()
     stbi_image_free(data);
 
 	// add coordinate system controls here (e.g. toggle between world/local space, adjust axis orientation, etc.) and pass them to shader for more flexible animation effects
+    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+    glm::mat4 trans = glm::mat4(1.0f);
+    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+    vec = trans * vec;
+    std::cout << vec.x << vec.y << vec.z << std::endl;
+
+    glm::mat4 trans2 = glm::mat4(1.0f);
+    trans2 = glm::rotate(trans2, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+    trans2 = glm::scale(trans2, glm::vec3(0.5, 0.5, 0.5));
+    std::cout << trans2[0][0] << " " << trans2[0][1] << " " << trans2[0][2] << " " << trans2[0][3] << std::endl;
+
+    unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
     // Render loop
     while (!glfwWindowShouldClose(window))
@@ -269,18 +282,21 @@ int main()
         GLfloat greenValue = sinf(timeValue) * 0.5f + 0.5f;
 		shader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
 
+        //glm::mat4 trans = glm::mat4(1.0f);
+        //trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+        //shader.setMat4("transform", trans);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+        shader.setMat4("transform", trans);
+
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
 
     glfwDestroyWindow(window);
     glfwTerminate();
-
-    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-    vec = trans * vec;
-    std::cout << vec.x << vec.y << vec.z << std::endl;
 
     return 0;
 }
