@@ -8,6 +8,9 @@ out vec3 ourColor;
 out vec2 ourTex;
 
 uniform mat4 transform;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 // ───────── uniforms ─────────
 uniform float uTime;
@@ -141,7 +144,7 @@ vec3 computeAnimationOffset()
 void main()
 {
     vec3 animOffset = computeAnimationOffset();
-    gl_Position = transform * vec4(aPos + uOffset + animOffset, 1.0);
+    gl_Position = projection * view * transform * vec4(aPos + animOffset + uOffset, 1.0);
     ourColor = aColor;
     ourTex = aTex;
 }

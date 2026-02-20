@@ -222,7 +222,7 @@ int main()
 
     unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-
+    glEnable(GL_DEPTH_TEST);
     // Render loop
     while (!glfwWindowShouldClose(window))
     {
@@ -230,9 +230,24 @@ int main()
         processInput(window);
 
         glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         shader.use();
+
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.0f, -0.0f, -2.0f));
+        trans = glm::rotate(trans,
+            (float)glfwGetTime(),
+            glm::vec3(1.0f, 0.0f, 0.0f));
+
+        shader.setMat4("view", view);
+        shader.setMat4("projection", projection);
+        shader.setMat4("transform", trans);
 
 		// texture uniform
         shader.setBool("uUseTexture", textureLoaded);
@@ -281,15 +296,6 @@ int main()
         GLfloat timeValue = (GLfloat)glfwGetTime();
         GLfloat greenValue = sinf(timeValue) * 0.5f + 0.5f;
 		shader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
-
-        //glm::mat4 trans = glm::mat4(1.0f);
-        //trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-        //shader.setMat4("transform", trans);
-
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-        shader.setMat4("transform", trans);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
