@@ -245,6 +245,15 @@ int main()
             (float)glfwGetTime(),
             glm::vec3(1.0f, 0.0f, 0.0f));
 
+        for (int i = 0; i < 5; i++)
+        {
+            glm::mat4 model = glm::mat4(1.0f);
+            model = glm::translate(model, glm::vec3(i * 1.0f, 0.0f, 0.0f));
+			model = glm::rotate(model, (float)glfwGetTime() * (i + 1), glm::vec3(0.0f, 1.0f, 0.0f));
+            shader.setMat4("transform", model);
+            triangle.Draw();
+        }
+
         shader.setMat4("view", view);
         shader.setMat4("projection", projection);
         shader.setMat4("transform", trans);
@@ -273,15 +282,6 @@ int main()
 
         // set the current animation type from the cycling key
         shader.setInt("uAnimType", currentAnimType);
-
-        for (int i = 0; i < 5; i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(i * 1.0f, 0.0f, 0.0f));
-
-            shader.setMat4("transform", model);
-            triangle.Draw();
-        }
 
         switch (currentMesh)
         {
