@@ -1,353 +1,359 @@
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <glm.hpp>
-#include <gtc/matrix_transform.hpp>
-#include <gtc/type_ptr.hpp>
-#include <iostream>
 
-#include "stb_image.h"
-
-#include "Mesh.h"
-#include "Rectangle.h"
-#include "Circle.h"
-#include "Triangle.h"
-#include "ScreenQuad.h"
-#include "Shader.h"
-
-static bool fill = true;
-static bool wireframe = false;
-static bool point = false;
-static int currentAnimType = 1; // start with 1 = sine
-static const int maxAnimType = 9; // total number of animations we defined in shader
-
-// How to extend the mesh so it can render a .obj or .fbx file?
-// 1. Add a new class ObjMesh that inherits from Mesh.
-// 2. Implement a constructor that loads the .obj file and sets up the vertex data.
-// 3. Implement the Draw() method to render the loaded mesh.
-// 4. Add a new case in the RenderMesh enum and handle it in the main render loop.
-// 5. Add input handling to switch to the new mesh type.
-enum class RenderMesh
-{
-    Triangle,
-    Rectangle,
-    Circle,
-    ScreenQuad
-};
-
-static RenderMesh currentMesh = RenderMesh::Triangle;
-
-// Resize callback
-void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    glViewport(0, 0, width, height);
-}
-
-static glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-static glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
-static glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
-// Input
-// TO DO: add control scheme
-void processInput(GLFWwindow* window)
-{
-
-    static bool aPressedLastFrame = false;
-
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
-
-    const float cameraSpeed = 0.05f; // adjust accordingly
-    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-        cameraPos += cameraSpeed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-        cameraPos -= cameraSpeed * cameraFront;
-    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
-
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        fill = true;
-        wireframe = false;
-        point = false;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glLineWidth(2.0f);
-        fill = false;
-		wireframe = true;
-        point = false;
-    }
-
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-        glPointSize(5.0f);
-        fill = false;
-        wireframe = false;
-		point = true;
-    }
-
-    // Face culling controls
-    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
-        glEnable(GL_CULL_FACE);
-
-    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
-        glDisable(GL_CULL_FACE);
-
-    // Mesh switching
-    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
-        currentMesh = RenderMesh::Triangle;
-
-    if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
-        currentMesh = RenderMesh::Rectangle;
-
-    if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
-        currentMesh = RenderMesh::Circle;
-
-    if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
-        currentMesh = RenderMesh::ScreenQuad;
-
-    // Cycle animation type with A key
-    bool aPressed = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
-    if (aPressed && !aPressedLastFrame) // only trigger once per press
-    {
-        currentAnimType++;
-        if (currentAnimType > maxAnimType)
-            currentAnimType = 1; // wrap around
-        std::cout << "Animation type: " << currentAnimType << std::endl;
-    }
-    aPressedLastFrame = aPressed;
-}
-
-// to do level switch
-// to do : add more complex animation types (e.g. physics-based, procedural, etc.) and implement them in the shader for more dynamic and varied animation effects
 int main()
 {
-    // GLFW init
-    glfwInit();
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-
-    GLFWwindow* window = glfwCreateWindow(800, 600, "GLFW 3.4 + OpenGL 4.6", nullptr, nullptr);
-    if (!window)
-    {
-        std::cerr << "Failed to create window\n";
-        glfwTerminate();
-        return -1;
-    }
-	// to do: add lighting controls here (e.g. toggle directional/point lights, adjust light color/intensity, etc.) and pass them to shader for dynamic lighting effects
-    glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
-
-    // GLAD
-    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
-    {
-        std::cerr << "Failed to initialize GLAD\n";
-        return -1;
-    }
-    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
-
-    // Shaders
-    Shader shader("shaders/vertex.glsl", "shaders/fragment.glsl");
-
-	// add ecs system here and create entities with different components (e.g. Transform, Renderable, Physics) to manage complex animations and interactions in a more organized way
-	Triangle triangle;
-	Rectangle rectangle(0.8f, 0.6f);
-	Circle circle(0.5f, 64);
-	ScreenQuad screenQuad;
-    unsigned int texture;
-    unsigned int texture2;
-    bool textureLoaded = false;
-
-    // Generate textures
-    glGenTextures(1, &texture);
-    glGenTextures(1, &texture2);
-
-    // =====================
-    // TEXTURE 1 (wall.jpg)
-    // =====================
-    glBindTexture(GL_TEXTURE_2D, texture);
-
-    // texture parameters
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    int width, height, nrChannels;
-    unsigned char* data = stbi_load("wall.jpg", &width, &height, &nrChannels, 0);
-
-    if (data)
-    {
-        textureLoaded = true;
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load wall.jpg" << std::endl;
-    }
-    stbi_image_free(data);
-
-
-    // ==========================
-    // TEXTURE 2 (awesomeface.png)
-    // ==========================
-    glBindTexture(GL_TEXTURE_2D, texture2);
-
-    // Set parameters again (each texture needs its own parameters)
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-    stbi_set_flip_vertically_on_load(true);
-    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
-    stbi_set_flip_vertically_on_load(false);
-    if (data)
-    {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-        glGenerateMipmap(GL_TEXTURE_2D);
-    }
-    else
-    {
-        std::cout << "Failed to load awesomeface.png" << std::endl;
-    }
-    stbi_image_free(data);
-
-	// add coordinate system controls here (e.g. toggle between world/local space, adjust axis orientation, etc.) and pass them to shader for more flexible animation effects
-    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
-    glm::mat4 trans = glm::mat4(1.0f);
-    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
-    vec = trans * vec;
-    std::cout << vec.x << vec.y << vec.z << std::endl;
-
-    glm::mat4 trans2 = glm::mat4(1.0f);
-    trans2 = glm::rotate(trans2, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
-    trans2 = glm::scale(trans2, glm::vec3(0.5, 0.5, 0.5));
-    std::cout << trans2[0][0] << " " << trans2[0][1] << " " << trans2[0][2] << " " << trans2[0][3] << std::endl;
-
-    unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
-    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
-    glEnable(GL_DEPTH_TEST);
-
-    // Camera
-    //glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
-    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
-    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
-    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
-    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
-    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
-    //glm::mat4 view;
-    //view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
-    //    glm::vec3(0.0f, 0.0f, 0.0f),
-    //    glm::vec3(0.0f, 1.0f, 0.0f));
-
-	// To do: add camera ui and controls here (e.g. orbit, pan, zoom, etc.) for more interactive and dynamic scene navigation
-
-    // Render loop
-    while (!glfwWindowShouldClose(window))
-    {
-		// delta time for animation timing
-        processInput(window);
-
-        glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        shader.use();
-
-        //glm::mat4 view = glm::mat4(1.0f);
-        //view = glm::translate(view, cameraPos);
-        //const float radius = 10.0f;
-        //float camX = sin(glfwGetTime()) * radius;
-        //float camZ = cos(glfwGetTime()) * radius;
-        glm::mat4 view;
-        view = glm::lookAt(cameraPos, glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
-
-        glm::mat4 projection;
-        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-
-        shader.setMat4("view", view);
-        shader.setMat4("projection", projection);
-
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.0f, -0.0f, -2.0f));
-        trans = glm::rotate(trans,
-            (float)glfwGetTime(),
-            glm::vec3(1.0f, 0.0f, 0.0f));
-
-        for (int i = 0; i < 5; i++)
-        {
-            glm::mat4 model = glm::mat4(1.0f);
-            model = glm::translate(model, glm::vec3(i * 1.0f, 0.0f, 0.0f));
-            model = glm::rotate(model, (float)glfwGetTime() * (i + 1), glm::vec3(0.0f, 1.0f, 0.0f));
-            shader.setMat4("transform", model);
-            triangle.Draw();
-        }
-
-        shader.setMat4("transform", trans);
-
-		// texture uniform
-        shader.setBool("uUseTexture", textureLoaded);
-        if (textureLoaded)
-        {
-            glActiveTexture(GL_TEXTURE0);
-            glBindTexture(GL_TEXTURE_2D, texture);
-            glActiveTexture(GL_TEXTURE1);
-            glBindTexture(GL_TEXTURE_2D, texture2);
-            shader.setInt("uTexture", 0);
-			shader.setInt("uTexture2", 1);
-        }
-
-		// animation uniforms
-        shader.setBool("uAnimate", false);
-        shader.setFloat("uTime", static_cast<float>(glfwGetTime()));
-        shader.setVec3("uOffset", 0.0f, 0.0f, 0.0f);
-        shader.setFloat("uSpeed", 1.0f);
-
-        // axis for axis-based animations
-        shader.setVec3("uAxis", 0.0f, 1.0f, 0.0f);
-        shader.setFloat("uAmp", 0.3f);
-
-        // set the current animation type from the cycling key
-        shader.setInt("uAnimType", currentAnimType);
-
-        switch (currentMesh)
-        {
-        case RenderMesh::Triangle:
-            triangle.Draw();
-            break;
-
-        case RenderMesh::Rectangle:
-            rectangle.Draw();
-            break;
-
-        case RenderMesh::Circle:
-            circle.Draw();
-            break;
-
-        case RenderMesh::ScreenQuad:
-            screenQuad.Draw();
-            break;
-        }
-
-        GLfloat timeValue = (GLfloat)glfwGetTime();
-        GLfloat greenValue = sinf(timeValue) * 0.5f + 0.5f;
-		shader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
-
-        glfwSwapBuffers(window);
-        glfwPollEvents();
-    }
-
-    glfwDestroyWindow(window);
-    glfwTerminate();
-
-    return 0;
+	return 0;
 }
+
+//#include <glad/glad.h>
+//#include <GLFW/glfw3.h>
+//#include <glm.hpp>
+//#include <gtc/matrix_transform.hpp>
+//#include <gtc/type_ptr.hpp>
+//#include <iostream>
+//
+//#include "stb_image.h"
+//
+//#include "Mesh.h"
+//#include "Rectangle.h"
+//#include "Circle.h"
+//#include "Triangle.h"
+//#include "ScreenQuad.h"
+//#include "Shader.h"
+//
+//static bool fill = true;
+//static bool wireframe = false;
+//static bool point = false;
+//static int currentAnimType = 1; // start with 1 = sine
+//static const int maxAnimType = 9; // total number of animations we defined in shader
+//
+//// How to extend the mesh so it can render a .obj or .fbx file?
+//// 1. Add a new class ObjMesh that inherits from Mesh.
+//// 2. Implement a constructor that loads the .obj file and sets up the vertex data.
+//// 3. Implement the Draw() method to render the loaded mesh.
+//// 4. Add a new case in the RenderMesh enum and handle it in the main render loop.
+//// 5. Add input handling to switch to the new mesh type.
+//enum class RenderMesh
+//{
+//    Triangle,
+//    Rectangle,
+//    Circle,
+//    ScreenQuad
+//};
+//
+//static RenderMesh currentMesh = RenderMesh::Triangle;
+//
+//// Resize callback
+//void framebuffer_size_callback(GLFWwindow* window, int width, int height)
+//{
+//    glViewport(0, 0, width, height);
+//}
+//
+//static glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+//static glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, 1.0f);
+//static glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+//// Input
+//// TO DO: add control scheme
+//void processInput(GLFWwindow* window)
+//{
+//
+//    static bool aPressedLastFrame = false;
+//
+//    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+//        glfwSetWindowShouldClose(window, true);
+//
+//    const float cameraSpeed = 0.05f; // adjust accordingly
+//    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
+//        cameraPos += cameraSpeed * cameraFront;
+//    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
+//        cameraPos -= cameraSpeed * cameraFront;
+//    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+//        cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+//    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+//        cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed;
+//
+//    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+//    {
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//        fill = true;
+//        wireframe = false;
+//        point = false;
+//    }
+//
+//    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+//    {
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+//        glLineWidth(2.0f);
+//        fill = false;
+//		wireframe = true;
+//        point = false;
+//    }
+//
+//    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+//    {
+//        glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+//        glPointSize(5.0f);
+//        fill = false;
+//        wireframe = false;
+//		point = true;
+//    }
+//
+//    // Face culling controls
+//    if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+//        glEnable(GL_CULL_FACE);
+//
+//    if (glfwGetKey(window, GLFW_KEY_V) == GLFW_PRESS)
+//        glDisable(GL_CULL_FACE);
+//
+//    // Mesh switching
+//    if (glfwGetKey(window, GLFW_KEY_4) == GLFW_PRESS)
+//        currentMesh = RenderMesh::Triangle;
+//
+//    if (glfwGetKey(window, GLFW_KEY_5) == GLFW_PRESS)
+//        currentMesh = RenderMesh::Rectangle;
+//
+//    if (glfwGetKey(window, GLFW_KEY_6) == GLFW_PRESS)
+//        currentMesh = RenderMesh::Circle;
+//
+//    if (glfwGetKey(window, GLFW_KEY_7) == GLFW_PRESS)
+//        currentMesh = RenderMesh::ScreenQuad;
+//
+//    // Cycle animation type with A key
+//    bool aPressed = glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS;
+//    if (aPressed && !aPressedLastFrame) // only trigger once per press
+//    {
+//        currentAnimType++;
+//        if (currentAnimType > maxAnimType)
+//            currentAnimType = 1; // wrap around
+//        std::cout << "Animation type: " << currentAnimType << std::endl;
+//    }
+//    aPressedLastFrame = aPressed;
+//}
+//
+//// to do level switch
+//// to do : add more complex animation types (e.g. physics-based, procedural, etc.) and implement them in the shader for more dynamic and varied animation effects
+//int main()
+//{
+//    // GLFW init
+//    glfwInit();
+//    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+//    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6);
+//    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+//
+//    GLFWwindow* window = glfwCreateWindow(800, 600, "GLFW 3.4 + OpenGL 4.6", nullptr, nullptr);
+//    if (!window)
+//    {
+//        std::cerr << "Failed to create window\n";
+//        glfwTerminate();
+//        return -1;
+//    }
+//	// to do: add lighting controls here (e.g. toggle directional/point lights, adjust light color/intensity, etc.) and pass them to shader for dynamic lighting effects
+//    glfwMakeContextCurrent(window);
+//    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+//
+//    // GLAD
+//    if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+//    {
+//        std::cerr << "Failed to initialize GLAD\n";
+//        return -1;
+//    }
+//    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+//
+//    std::cout << "OpenGL Version: " << glGetString(GL_VERSION) << std::endl;
+//
+//    // Shaders
+//    Shader shader("shaders/vertex.glsl", "shaders/fragment.glsl");
+//
+//	// add ecs system here and create entities with different components (e.g. Transform, Renderable, Physics) to manage complex animations and interactions in a more organized way
+//	Triangle triangle;
+//	Rectangle rectangle(0.8f, 0.6f);
+//	Circle circle(0.5f, 64);
+//	ScreenQuad screenQuad;
+//    unsigned int texture;
+//    unsigned int texture2;
+//    bool textureLoaded = false;
+//
+//    // Generate textures
+//    glGenTextures(1, &texture);
+//    glGenTextures(1, &texture2);
+//
+//    // =====================
+//    // TEXTURE 1 (wall.jpg)
+//    // =====================
+//    glBindTexture(GL_TEXTURE_2D, texture);
+//
+//    // texture parameters
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//
+//    int width, height, nrChannels;
+//    unsigned char* data = stbi_load("wall.jpg", &width, &height, &nrChannels, 0);
+//
+//    if (data)
+//    {
+//        textureLoaded = true;
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+//        glGenerateMipmap(GL_TEXTURE_2D);
+//    }
+//    else
+//    {
+//        std::cout << "Failed to load wall.jpg" << std::endl;
+//    }
+//    stbi_image_free(data);
+//
+//
+//    // ==========================
+//    // TEXTURE 2 (awesomeface.png)
+//    // ==========================
+//    glBindTexture(GL_TEXTURE_2D, texture2);
+//
+//    // Set parameters again (each texture needs its own parameters)
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+//    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+//
+//    stbi_set_flip_vertically_on_load(true);
+//    data = stbi_load("awesomeface.png", &width, &height, &nrChannels, 0);
+//    stbi_set_flip_vertically_on_load(false);
+//    if (data)
+//    {
+//        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+//        glGenerateMipmap(GL_TEXTURE_2D);
+//    }
+//    else
+//    {
+//        std::cout << "Failed to load awesomeface.png" << std::endl;
+//    }
+//    stbi_image_free(data);
+//
+//	// add coordinate system controls here (e.g. toggle between world/local space, adjust axis orientation, etc.) and pass them to shader for more flexible animation effects
+//    glm::vec4 vec(1.0f, 0.0f, 0.0f, 1.0f);
+//    glm::mat4 trans = glm::mat4(1.0f);
+//    trans = glm::translate(trans, glm::vec3(1.0f, 1.0f, 0.0f));
+//    vec = trans * vec;
+//    std::cout << vec.x << vec.y << vec.z << std::endl;
+//
+//    glm::mat4 trans2 = glm::mat4(1.0f);
+//    trans2 = glm::rotate(trans2, glm::radians(90.0f), glm::vec3(0.0, 0.0, 1.0));
+//    trans2 = glm::scale(trans2, glm::vec3(0.5, 0.5, 0.5));
+//    std::cout << trans2[0][0] << " " << trans2[0][1] << " " << trans2[0][2] << " " << trans2[0][3] << std::endl;
+//
+//    unsigned int transformLoc = glGetUniformLocation(shader.ID, "transform");
+//    glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+//    glEnable(GL_DEPTH_TEST);
+//
+//    // Camera
+//    //glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+//    glm::vec3 cameraTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+//    glm::vec3 cameraDirection = glm::normalize(cameraPos - cameraTarget);
+//    glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f);
+//    glm::vec3 cameraRight = glm::normalize(glm::cross(up, cameraDirection));
+//    glm::vec3 cameraUp = glm::cross(cameraDirection, cameraRight);
+//    //glm::mat4 view;
+//    //view = glm::lookAt(glm::vec3(0.0f, 0.0f, 3.0f),
+//    //    glm::vec3(0.0f, 0.0f, 0.0f),
+//    //    glm::vec3(0.0f, 1.0f, 0.0f));
+//
+//	// To do: add camera ui and controls here (e.g. orbit, pan, zoom, etc.) for more interactive and dynamic scene navigation
+//
+//    // Render loop
+//    while (!glfwWindowShouldClose(window))
+//    {
+//		// delta time for animation timing
+//        processInput(window);
+//
+//        glClearColor(0.05f, 0.08f, 0.12f, 1.0f);
+//        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//
+//        shader.use();
+//
+//        //glm::mat4 view = glm::mat4(1.0f);
+//        //view = glm::translate(view, cameraPos);
+//        //const float radius = 10.0f;
+//        //float camX = sin(glfwGetTime()) * radius;
+//        //float camZ = cos(glfwGetTime()) * radius;
+//        glm::mat4 view;
+//        view = glm::lookAt(cameraPos, glm::vec3(0.0f, 0.0f, 0.0f), cameraUp);
+//
+//        glm::mat4 projection;
+//        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+//
+//        shader.setMat4("view", view);
+//        shader.setMat4("projection", projection);
+//
+//        glm::mat4 trans = glm::mat4(1.0f);
+//        trans = glm::translate(trans, glm::vec3(0.0f, -0.0f, -2.0f));
+//        trans = glm::rotate(trans,
+//            (float)glfwGetTime(),
+//            glm::vec3(1.0f, 0.0f, 0.0f));
+//
+//        for (int i = 0; i < 5; i++)
+//        {
+//            glm::mat4 model = glm::mat4(1.0f);
+//            model = glm::translate(model, glm::vec3(i * 1.0f, 0.0f, 0.0f));
+//            model = glm::rotate(model, (float)glfwGetTime() * (i + 1), glm::vec3(0.0f, 1.0f, 0.0f));
+//            shader.setMat4("transform", model);
+//            triangle.Draw();
+//        }
+//
+//        shader.setMat4("transform", trans);
+//
+//		// texture uniform
+//        shader.setBool("uUseTexture", textureLoaded);
+//        if (textureLoaded)
+//        {
+//            glActiveTexture(GL_TEXTURE0);
+//            glBindTexture(GL_TEXTURE_2D, texture);
+//            glActiveTexture(GL_TEXTURE1);
+//            glBindTexture(GL_TEXTURE_2D, texture2);
+//            shader.setInt("uTexture", 0);
+//			shader.setInt("uTexture2", 1);
+//        }
+//
+//		// animation uniforms
+//        shader.setBool("uAnimate", false);
+//        shader.setFloat("uTime", static_cast<float>(glfwGetTime()));
+//        shader.setVec3("uOffset", 0.0f, 0.0f, 0.0f);
+//        shader.setFloat("uSpeed", 1.0f);
+//
+//        // axis for axis-based animations
+//        shader.setVec3("uAxis", 0.0f, 1.0f, 0.0f);
+//        shader.setFloat("uAmp", 0.3f);
+//
+//        // set the current animation type from the cycling key
+//        shader.setInt("uAnimType", currentAnimType);
+//
+//        switch (currentMesh)
+//        {
+//        case RenderMesh::Triangle:
+//            triangle.Draw();
+//            break;
+//
+//        case RenderMesh::Rectangle:
+//            rectangle.Draw();
+//            break;
+//
+//        case RenderMesh::Circle:
+//            circle.Draw();
+//            break;
+//
+//        case RenderMesh::ScreenQuad:
+//            screenQuad.Draw();
+//            break;
+//        }
+//
+//        GLfloat timeValue = (GLfloat)glfwGetTime();
+//        GLfloat greenValue = sinf(timeValue) * 0.5f + 0.5f;
+//		shader.setVec4("ourColor", 0.0f, greenValue, 0.0f, 1.0f);
+//
+//        glfwSwapBuffers(window);
+//        glfwPollEvents();
+//    }
+//
+//    glfwDestroyWindow(window);
+//    glfwTerminate();
+//
+//    return 0;
+//}
