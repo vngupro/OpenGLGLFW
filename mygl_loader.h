@@ -25,6 +25,12 @@
 extern "C" {
 #endif
 
+struct gladGLversionStruct {
+    int major;
+    int minor;
+};
+
+typedef void* (*MYGLloadproc)(const char* name);
 
 #ifdef __cplusplus
 }
