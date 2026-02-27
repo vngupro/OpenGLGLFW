@@ -32,6 +32,30 @@ struct gladGLversionStruct {
 
 typedef void* (*MYGLloadproc)(const char* name);
 
+#ifndef GLAPI
+#   if defined(MYGL_GLAPI_EXPORT)
+#       if defined(_WIN32) || defined(__CYWIN__)
+#           if defined(MYGL_GLAPI_EXPORT_BUILD)
+#               if defined (__GNUC__)
+#                   define GLAPI __attribute__((dllexport)) extern
+#               else
+#                   define GLAPI __declspec(dllexport) extern
+#               endif
+#           else
+#               if defined (__GNUC__)
+#                   define GLAPI __attribute__((dllimport)) extern
+#               else
+#                   define GLAPI __declspec(dllimport) extern
+#               endif
+#           endif
+#       elif defined(__GNUC__) && defined(MYGL_GLAPI_EXPORT_BUILD)
+#           define GLAPI __attribute__((visibility("default"))) extern
+#       else
+#           define GLAPI extern
+#       endif
+#   endif
+#endif
+
 #ifdef __cplusplus
 }
 #endif
