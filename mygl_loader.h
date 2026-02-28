@@ -25,7 +25,7 @@
 extern "C" {
 #endif
 
-struct gladGLversionStruct {
+    struct myGLversionStruct{
     int major;
     int minor;
 };
@@ -53,8 +53,17 @@ typedef void* (*MYGLloadproc)(const char* name);
 #       else
 #           define GLAPI extern
 #       endif
+#   else
+#       define GLAPI extern
 #   endif
 #endif
+
+GLAPI struct myGLversionStruct GLVersion;
+
+GLAPI int gladLoadGL(void);
+GLAPI int gladLoadGLLoader(MYGLloadproc);
+
+#include <KHR/khrplatform.h>
 
 #ifdef __cplusplus
 }
