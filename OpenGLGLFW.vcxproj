@@ -137,7 +137,6 @@
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
-    <ClCompile Include="mygl_loader.cpp" />
     <ClCompile Include="PCH.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="ScreenQuad.cpp" />
@@ -151,7 +150,7 @@
   <ItemGroup>
     <ClInclude Include="Circle.h" />
     <ClInclude Include="Mesh.h" />
-    <ClInclude Include="mygl_loader.h" />
+    <ClInclude Include="mygl_loader.hpp" />
     <ClInclude Include="Rectangle.h" />
     <ClInclude Include="ScreenQuad.h" />
     <ClInclude Include="Shader.h" />

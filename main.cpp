@@ -1,3 +1,4 @@
+#include "mygl_loader.hpp"
 
 int main()
 {

@@ -51,9 +51,6 @@
     <ClCompile Include="PCH.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="mygl_loader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\fragment.glsl">
@@ -85,7 +82,7 @@
     <ClInclude Include="stb_image.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="mygl_loader.h">
+    <ClInclude Include="mygl_loader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
