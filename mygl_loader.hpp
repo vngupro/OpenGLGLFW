@@ -29,3 +29,5 @@ using GLdouble = double;
 using GLboolean = std::uint8_t;
 using GLsizeiptr = std::intptr_t;
 using GLchar = char;
+
+// To do : Add more OpenGL function declarations here as needed
