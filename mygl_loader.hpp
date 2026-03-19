@@ -30,4 +30,16 @@ using GLboolean = std::uint8_t;
 using GLsizeiptr = std::intptr_t;
 using GLchar = char;
 
+using GLenum = std::uint32_t;
+using GLbitfield = std::uint32_t;
+using GLbyte = std::int8_t;
+using GLshort = std::int16_t;
+using GLsizei = std::int32_t;
+using GLubyte = std::uint8_t;
+using GLushort = std::uint16_t;
+using GLulong = std::uint32_t;
+using GLintptr = std::intptr_t;
+using GLclampf = float;
+using GLclampd = double;
+
 // To do : Add more OpenGL function declarations here as needed
