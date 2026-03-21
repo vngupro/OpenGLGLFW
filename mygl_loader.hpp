@@ -42,4 +42,13 @@ using GLintptr = std::intptr_t;
 using GLclampf = float;
 using GLclampd = double;
 
+using PFNGLGENBUFFERSPROC = void (*)(GLsizei n, GLuint* buffers);
+using PFNGLBINDBUFFERPROC = void (*)(GLenum target, GLuint buffer);
+using PFNGLBUFFERDATAPROC = void (*)(GLenum target, GLsizeiptr size, const void* data, GLenum usage);
+using PFNGLDELETEBUFFERSPROC = void (*)(GLsizei n, const GLuint* buffers);
+
+inline PFNGLGENBUFFERSPROC glGenBuffers = nullptr;
+inline PFNGLBINDBUFFERPROC glBindBuffer = nullptr;
+inline PFNGLBUFFERDATAPROC glBufferData = nullptr;
+inline PFNGLDELETEBUFFERSPROC glDeleteBuffers = nullptr;
 // To do : Add more OpenGL function declarations here as needed
