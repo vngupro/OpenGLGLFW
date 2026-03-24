@@ -133,6 +133,14 @@ inline PFNGLTEXPARAMETERIPROC glTexParameteri = nullptr;
 inline PFNGLTEXIMAGE2DPROC glTexImage2D = nullptr;
 inline PFNGLDELETETEXTURESPROC glDeleteTextures = nullptr;
 
+using PFNGLCLEARPROC = void (*)(GLbitfield);
+using PFNGLCLEARCOLORPROC = void (*)(GLfloat, GLfloat, GLfloat, GLfloat);
+using PFNGLVIEWPORTPROC = void (*)(GLint, GLint, GLsizei, GLsizei);
+
+inline PFNGLCLEARPROC glClear = nullptr;
+inline PFNGLCLEARCOLORPROC glClearColor = nullptr;
+inline PFNGLVIEWPORTPROC glViewport = nullptr;
+
 // Buffer targets
 #define GL_ARRAY_BUFFER 0x8892
 #define GL_ELEMENT_ARRAY_BUFFER 0x8893
