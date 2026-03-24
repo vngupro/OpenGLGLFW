@@ -132,4 +132,45 @@ inline PFNGLBINDTEXTUREPROC glBindTexture = nullptr;
 inline PFNGLTEXPARAMETERIPROC glTexParameteri = nullptr;
 inline PFNGLTEXIMAGE2DPROC glTexImage2D = nullptr;
 inline PFNGLDELETETEXTURESPROC glDeleteTextures = nullptr;
-// To do : Add more OpenGL function declarations here as needed
+
+// Buffer targets
+#define GL_ARRAY_BUFFER 0x8892
+#define GL_ELEMENT_ARRAY_BUFFER 0x8893
+
+// Usage
+#define GL_STATIC_DRAW 0x88E4
+#define GL_DYNAMIC_DRAW 0x88E8
+
+// Data types
+#define GL_FLOAT 0x1406
+#define GL_UNSIGNED_INT 0x1405
+#define GL_UNSIGNED_BYTE 0x1401
+
+// Booleans
+#define GL_FALSE 0
+#define GL_TRUE 1
+
+// Shader types
+#define GL_VERTEX_SHADER 0x8B31
+#define GL_FRAGMENT_SHADER 0x8B30
+
+// Shader params
+#define GL_COMPILE_STATUS 0x8B81
+#define GL_LINK_STATUS 0x8B82
+#define GL_INFO_LOG_LENGTH 0x8B84
+
+// Texture
+#define GL_TEXTURE_2D 0x0DE1
+#define GL_TEXTURE0 0x84C0
+
+// Texture params
+#define GL_TEXTURE_MIN_FILTER 0x2801
+#define GL_TEXTURE_MAG_FILTER 0x2800
+#define GL_LINEAR 0x2601
+
+// Formats
+#define GL_RGBA 0x1908
+#define GL_RGB 0x1907
+
+// Clear
+#define GL_COLOR_BUFFER_BIT 0x00004000
