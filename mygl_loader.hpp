@@ -141,6 +141,12 @@ inline PFNGLCLEARPROC glClear = nullptr;
 inline PFNGLCLEARCOLORPROC glClearColor = nullptr;
 inline PFNGLVIEWPORTPROC glViewport = nullptr;
 
+using PFNGLDRAWARRAYSPROC = void (*)(GLenum mode, GLint first, GLsizei count);
+using PFNGLDRAWELEMENTSPROC = void (*)(GLenum mode, GLsizei count, GLenum type, const void* indices);
+
+inline PFNGLDRAWARRAYSPROC glDrawArrays = nullptr;
+inline PFNGLDRAWELEMENTSPROC glDrawElements = nullptr;
+
 // Buffer targets
 #define GL_ARRAY_BUFFER 0x8892
 #define GL_ELEMENT_ARRAY_BUFFER 0x8893
@@ -187,9 +193,3 @@ inline PFNGLVIEWPORTPROC glViewport = nullptr;
 #define GL_BLEND                          0x0BE2
 #define GL_SRC_ALPHA                      0x0302
 #define GL_ONE_MINUS_SRC_ALPHA            0x0303
-
-using PFNGLDRAWARRAYSPROC = void (*)(GLenum mode, GLint first, GLsizei count);
-using PFNGLDRAWELEMENTSPROC = void (*)(GLenum mode, GLsizei count, GLenum type, const void* indices);
-
-inline PFNGLDRAWARRAYSPROC glDrawArrays = nullptr;
-inline PFNGLDRAWELEMENTSPROC glDrawElements = nullptr;
