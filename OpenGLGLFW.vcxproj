@@ -137,6 +137,7 @@
     <ClCompile Include="Circle.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="mygl_loader.cpp" />
     <ClCompile Include="PCH.cpp" />
     <ClCompile Include="Rectangle.cpp" />
     <ClCompile Include="ScreenQuad.cpp" />

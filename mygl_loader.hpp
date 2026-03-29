@@ -193,3 +193,5 @@ inline PFNGLDRAWELEMENTSPROC glDrawElements = nullptr;
 #define GL_BLEND                          0x0BE2
 #define GL_SRC_ALPHA                      0x0302
 #define GL_ONE_MINUS_SRC_ALPHA            0x0303
+
+// toclean
