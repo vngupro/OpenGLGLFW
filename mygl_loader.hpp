@@ -195,3 +195,4 @@ inline PFNGLDRAWELEMENTSPROC glDrawElements = nullptr;
 #define GL_ONE_MINUS_SRC_ALPHA            0x0303
 
 // toclean
+// add .cpp file with implementation of gladLoadGL and gladLoadGLLoader
