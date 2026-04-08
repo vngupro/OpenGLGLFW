@@ -198,3 +198,4 @@ inline PFNGLDRAWELEMENTSPROC glDrawElements = nullptr;
 // add .cpp file with implementation of gladLoadGL and gladLoadGLLoader
 // to do: add more functions as needed
 // to do: add error handling and logging
+// to do: add some utility functions for shader compilation and program linking
