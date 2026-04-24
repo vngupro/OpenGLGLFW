@@ -200,3 +200,4 @@ inline PFNGLDRAWELEMENTSPROC glDrawElements = nullptr;
 // to do: add error handling and logging
 // to do: add some utility functions for shader compilation and program linking
 // to do: add support for extensions if needed
+// to do: ADD support for OpenGL 3.3+ features like Uniform Buffer Objects, Framebuffer Objects, etc.
