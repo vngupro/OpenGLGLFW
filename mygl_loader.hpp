@@ -201,3 +201,4 @@ inline PFNGLDRAWELEMENTSPROC glDrawElements = nullptr;
 // to do: add some utility functions for shader compilation and program linking
 // to do: add support for extensions if needed
 // to do: ADD support for OpenGL 3.3+ features like Uniform Buffer Objects, Framebuffer Objects, etc.
+// to do: add support for OpenGL 4.0+ features like Compute Shaders, Tessellation Shaders, etc.
