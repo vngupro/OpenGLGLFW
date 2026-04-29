@@ -201,3 +201,4 @@ inline PFNGLDRAWELEMENTSPROC glDrawElements = nullptr;
 // to do: add some utility functions for shader compilation and program linking
 // to do: add support for extensions if needed
 // to do: explain how to use this loader in the documentation
+// to do: add missing OpenGL constants as needed
